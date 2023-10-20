@@ -1,34 +1,14 @@
 package com.pluralsight;
 
 public class Product {
-    private String name;
     private String id;
+    private String name;
     private double price;
-    private String department;
 
-    public Product(String name, String id, double price, String department) {
-        this.name = name;
+    public Product(String id, String name, double price) {
         this.id = id;
-        this.price = price;
-        this.department = department;
-    }
-
-    @Override
-    public String toString() {
-        return "Product{" +
-                "name='" + name + '\'' +
-                ", id='" + id + '\'' +
-                ", price=" + price +
-                ", department='" + department + '\'' +
-                '}';
-    }
-/*--getter/setter--*/
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
         this.name = name;
+        this.price = price;
     }
 
     public String getId() {
@@ -39,6 +19,14 @@ public class Product {
         this.id = id;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public double getPrice() {
         return price;
     }
@@ -47,12 +35,12 @@ public class Product {
         this.price = price;
     }
 
-    public String getDepartment() {
-        return department;
+    @Override
+    public String toString() {
+        return "Product{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", price=" + price +
+                '}';
     }
-
-    public void setDepartment(String department) {
-        this.department = department;
-    }
-
 }
