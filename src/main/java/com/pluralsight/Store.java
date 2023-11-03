@@ -2,6 +2,7 @@ package com.pluralsight;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -56,20 +57,18 @@ public class Store {
         // where id is a unique string identifier, name is the product name,
         // price is a double value representing the price of the product, and
         // in the inventory.
-        String line;
         try {
-            BufferedReader br = new BufferedReader(new FileReader(fileName));
-            while ((line = br.readLine()) != null) {
-                String[] parts = line.split("\\|");
-                String id = parts[0];
-                String name = parts[1];
-                double price = Double.parseDouble(parts[2]);
-                inventory.add (new Product(id, name, price));
+            BufferedReader reader = new BufferedReader(new FileReader(fileName));
+            String line = "";
+            while ((line = reader.readLine()) != null) {
+                String[] fields = line.split("\\|");
+                Product product = new Product(fields[0], fields[1], Double.parseDouble(fields[2]));
+                inventory.add(product);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+            reader.close();
+        } catch (IOException e) {
+            System.out.println("Error loading inventory: " + e.getMessage());
         }
-
     }
 
     public static void displayProducts(ArrayList<Product> inventory, ArrayList<Product> cart, Scanner scanner) {
@@ -79,10 +78,27 @@ public class Store {
         // their cart, and the quantity they want to add. The method should
         // add the selected product and quantity to the cart ArrayList.
 
-        for (Product product: inventory){
-            System.out.println(product);
+        System.out.println("Products:");
+        for (Product product : inventory) {
+            System.out.println(product.getId() + " " + product.getName() + " $" + product.getPrice());
+        }
+        System.out.println("Enter product ID to add to cart or X to go back to home screen:");
+        String choice = scanner.nextLine();
+        if (choice.equalsIgnoreCase("X")) {
+            return;
+        } else {
+            Product product = findProductById(choice, inventory);
+            if (product != null) {
+                cart.add(product);
+                System.out.println("Added " + product.getName() + " to cart!");
+                return;
+            } else {
+                System.out.println("Invalid product ID!");
+                return;
+            }
         }
     }
+
 
     public static void displayCart(ArrayList<Product> cart, Scanner scanner, double totalAmount) {
         // This method should display the items in the cart ArrayList, along
@@ -91,6 +107,23 @@ public class Store {
         // of the product they want to remove, and the quantity they want to
         // remove. The method should update the cart ArrayList and totalAmount
         // variable accordingly.
+        System.out.println("Cart:");
+        for (Product product : cart) {
+            System.out.println(product.getName() + " $" + product.getPrice());
+            totalAmount += product.getPrice();
+        }
+        System.out.println("Total amount: $" + totalAmount);
+        System.out.println("C - Check Out");
+        System.out.println("X - Go back to home screen");
+        String choice = scanner.nextLine();
+        if (choice.equalsIgnoreCase("C")) {
+            checkOut(cart, totalAmount);
+        } else if (choice.equalsIgnoreCase("X")) {
+            return;
+        } else {
+            System.out.println("Invalid choice!");
+            return;
+        }
     }
 
     public static void checkOut(ArrayList<Product> cart, double totalAmount) {
@@ -98,6 +131,24 @@ public class Store {
         // and display a summary of the purchase to the user. The method should
         // prompt the user to confirm the purchase, and deduct the total cost
         // from their account if they confirm.
+        System.out.println("Total amount owed: $" + totalAmount);
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Enter payment amount: $");
+        double payment = scanner.nextDouble();
+        if (payment < totalAmount) {
+            System.out.println("Payment amount is not enough!");
+            return;
+        } else {
+            double change = payment - totalAmount;
+            System.out.println("Change: $" + change);
+            System.out.println("Items sold:");
+            for (Product product : cart) {
+                System.out.println(product.getName() + " $" + product.getPrice());
+            }
+            cart.clear();
+            totalAmount = 0.0;
+            return;
+        }
     }
 
     public static Product findProductById(String id, ArrayList<Product> inventory) {
@@ -105,6 +156,11 @@ public class Store {
         // the specified ID, and return the corresponding Product object. If
         // no product with the specified ID is found, the method should return
         // null.
+        for (Product product : inventory) {
+            if (product.getId().equalsIgnoreCase(id)) {
+                return product;
+            }
+        }
         return null;
     }
 }
